@@ -64,15 +64,24 @@ def init_db():
             )
         """)
 
-        # 최초 실행 시 관리자 비밀번호를 해시 형태로 저장합니다.
-        row = conn.execute(
-            "SELECT setting_value FROM settings WHERE setting_key = 'admin_password_hash'"
-        ).fetchone()
-        if row is None:
+       
+        # 비밀번호 초기화 환경 변수가 있으면 관리자 비밀번호를 갱신합니다.
+        reset_password = os.environ.get("RESET_ADMIN_PASSWORD")
+
+        if reset_password:
+            conn.execute(
+                """INSERT INTO settings (setting_key, setting_value)
+                   VALUES (?, ?)
+                   ON CONFLICT(setting_key)
+                   DO UPDATE SET setting_value = excluded.setting_value""",
+                ("admin_password_hash", generate_password_hash(reset_password))
+            )
+        elif row is None:
             conn.execute(
                 "INSERT INTO settings (setting_key, setting_value) VALUES (?, ?)",
                 ("admin_password_hash", generate_password_hash(DEFAULT_ADMIN_PASSWORD))
             )
+
 
 
 def admin_required(view):
