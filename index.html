@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}석식 출석 및 익명 제보{% endblock %}
+{% block content %}
+<section class="hero">
+    <p class="eyebrow">DINNER CHECK</p>
+    <h1>석식 출석 확인</h1>
+    <p class="muted">등록된 학번을 입력해 석식 출석을 확인하세요.</p>
+</section>
+
+<section class="panel">
+    <h2>출석 확인</h2>
+    <form action="{{ url_for('check_attendance') }}" method="post">
+        <label for="student_id">학번</label>
+        <input id="student_id" name="student_id" type="text" inputmode="numeric"
+               maxlength="5" pattern="[0-9]{5}" placeholder="예: 20920" required>
+        <p class="hint">2학년 9반 20번은 20920으로 입력합니다.</p>
+        <button type="submit">출석 확인하기</button>
+    </form>
+</section>
+
+<section class="panel">
+    <h2>익명 제보</h2>
+    <p class="muted">석식 무단 이용이 의심되는 상황이나 급식실의 불편 사항을 제보할 수 있습니다.</p>
+    <form action="{{ url_for('submit_report') }}" method="post">
+        <label for="category">제보 종류</label>
+        <select id="category" name="category" required>
+            <option value="">선택해 주세요</option>
+            <option>무단 석식 이용 의심 신고</option>
+            <option>급식실 불편 사항</option>
+        </select>
+
+        <label for="location">발생 장소</label>
+        <input id="location" name="location" type="text"
+               placeholder="예: 급식실 입구, 배식대" maxlength="100" required>
+
+        <label for="suspected_student_id">관련 학번 (선택)</label>
+        <input id="suspected_student_id" name="suspected_student_id" type="text"
+               inputmode="numeric" maxlength="5" pattern="[0-9]{5}"
+               placeholder="모르면 비워 두세요">
+        <p class="hint">무단 이용 의심 신고의 경우에만 알고 있는 학번을 적을 수 있습니다.</p>
+
+        <label for="content">제보 내용</label>
+        <textarea id="content" name="content" rows="5" maxlength="2000"
+                  placeholder="언제, 어디서, 어떤 상황이 있었는지 사실에 근거해 작성해 주세요." required></textarea>
+
+        <div class="notice">
+            제보는 관리자만 확인할 수 있습니다. 확인되지 않은 내용을 사실처럼 단정하거나
+            개인을 비방하는 표현은 삼가 주세요.
+        </div>
+        <button type="submit" class="secondary-button">익명으로 제보하기</button>
+    </form>
+</section>
+{% endblock %}

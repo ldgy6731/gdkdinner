@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}관리자 페이지{% endblock %}
+{% block content %}
+<div class="admin-heading">
+    <div>
+        <p class="eyebrow">ADMIN DASHBOARD</p>
+        <h1>관리자 페이지</h1>
+        <p class="muted">{{ today }} 출석 현황 및 제보 관리</p>
+    </div>
+    <form method="post" action="{{ url_for('admin_logout') }}">
+        <button class="small-button secondary-button" type="submit">로그아웃</button>
+    </form>
+</div>
+
+<section class="stats">
+    <div class="stat-card"><span>등록 학생</span><strong>{{ students|length }}</strong></div>
+    <div class="stat-card"><span>오늘 출석</span><strong>{{ attendance|length }}</strong></div>
+    <div class="stat-card"><span>접수 제보</span><strong>{{ reports|length }}</strong></div>
+</section>
+
+<section class="panel">
+    <h2>학생 학번 일괄 등록</h2>
+    <p class="muted">학번을 줄바꿈, 쉼표 또는 공백으로 구분해 한꺼번에 입력하세요.</p>
+    <form method="post" action="{{ url_for('add_students') }}">
+        <label for="student_ids">학생 학번 목록</label>
+        <textarea id="student_ids" name="student_ids" rows="5"
+                  placeholder="20920&#10;20904&#10;20914&#10;20915&#10;20913" required></textarea>
+        <button type="submit">학번 등록하기</button>
+    </form>
+</section>
+
+<section class="panel">
+    <h2>오늘 출석 현황</h2>
+    {% if attendance %}
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>학번</th><th>출석 시간</th></tr></thead>
+            <tbody>
+            {% for item in attendance %}
+                <tr><td>{{ item.student_id }}</td><td>{{ item.check_time }}</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <p class="empty">아직 출석 기록이 없습니다.</p>
+    {% endif %}
+</section>
+
+<section class="panel">
+    <h2>등록된 학생 관리</h2>
+    {% if students %}
+    <div class="student-list">
+        {% for student in students %}
+        <div class="student-row">
+            <strong>{{ student.student_id }}</strong>
+            <form method="post" action="{{ url_for('delete_student') }}"
+                  onsubmit="return confirm('이 학번을 학생 목록에서 삭제할까요?');">
+                <input type="hidden" name="student_id" value="{{ student.student_id }}">
+                <button type="submit" class="delete-button">삭제</button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+        <p class="empty">등록된 학생이 없습니다.</p>
+    {% endif %}
+</section>
+
+<section class="panel">
+    <h2>익명 제보 목록</h2>
+    {% if reports %}
+        {% for report in reports %}
+        <article class="report-card">
+            <div class="report-top">
+                <span class="tag">{{ report.category }}</span>
+                <span class="muted small-text">{{ report.report_time }}</span>
+            </div>
+            <p><strong>장소:</strong> {{ report.location }}</p>
+            {% if report.suspected_student_id %}
+                <p><strong>관련 학번:</strong> {{ report.suspected_student_id }}</p>
+            {% endif %}
+            <p class="report-content">{{ report.content }}</p>
+            <form method="post" action="{{ url_for('delete_report') }}"
+                  onsubmit="return confirm('이 제보를 삭제할까요?');">
+                <input type="hidden" name="report_id" value="{{ report.id }}">
+                <button type="submit" class="delete-button">제보 삭제</button>
+            </form>
+        </article>
+        {% endfor %}
+    {% else %}
+        <p class="empty">접수된 제보가 없습니다.</p>
+    {% endif %}
+</section>
+
+<section class="panel">
+    <h2>관리자 비밀번호 변경</h2>
+    <p class="hint">보안을 위해 초기 비밀번호를 변경하세요. 새 비밀번호는 8자 이상이어야 합니다.</p>
+    <form method="post" action="{{ url_for('change_password') }}">
+        <label for="current_password">현재 비밀번호</label>
+        <input id="current_password" name="current_password" type="password" required>
+        <label for="new_password">새 비밀번호</label>
+        <input id="new_password" name="new_password" type="password" minlength="8" required>
+        <label for="confirm_password">새 비밀번호 확인</label>
+        <input id="confirm_password" name="confirm_password" type="password" minlength="8" required>
+        <button type="submit">비밀번호 변경</button>
+    </form>
+</section>
+{% endblock %}

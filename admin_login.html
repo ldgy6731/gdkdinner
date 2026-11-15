@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}관리자 로그인{% endblock %}
+{% block content %}
+<section class="panel narrow">
+    <p class="eyebrow">ADMIN</p>
+    <h1>관리자 로그인</h1>
+    <form method="post" action="{{ url_for('admin_login') }}">
+        <label for="password">비밀번호</label>
+        <input id="password" name="password" type="password" placeholder="관리자 비밀번호" required>
+        <p class="hint">초기 비밀번호는 1234입니다.</p>
+        <button type="submit">로그인</button>
+    </form>
+</section>
+{% endblock %}
